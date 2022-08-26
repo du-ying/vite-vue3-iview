@@ -61,7 +61,7 @@
       </div>
       <div class="toolbar-item" v-if="!noColumnsSetup">
         <Tooltip content="列设置" placement="top-end">
-          <Button class="border-0 ivu-btn-icon-only">
+          <Button class="border-0 ivu-btn-icon-only" @click="setupColumns">
             <Icon class="ms-0" custom="bi bi-sliders2" />
           </Button>
         </Tooltip>
@@ -77,12 +77,15 @@
         :total="total"
         :page-size="pageSize"
         :page-size-opts="pageSizeOpts" />
+  <AppTableDrawer ref="tableCardDrawer" />
 </template>
 
 <script>
-import { useTableSearchUtil, useTableSearchGroup } from '@/components/app-table-card/useTableSearch'
+import { useTableSearchUtil, useTableSearchGroup } from '@components/app-table-card/useTableSearch.js'
+import AppTableDrawer from '@components/app-table-card/app-table-drawer.vue'
 
 export default {
+  inheritAttrs: false,
   props: {
     noToolbar: { type: Boolean, default: false },
     noPage: { type: Boolean, default: false },
@@ -103,17 +106,18 @@ export default {
       expandBtn
     } = useTableSearchGroup()
     const {
-      parseToPlainInfo,
-      parseInt
+      parseToPlainInfo
     } = useTableSearchUtil()
     return {
       toggleExpand,
       noSearch,
       noExpand,
       expandBtn,
-      parseToPlainInfo,
-      parseInt
+      parseToPlainInfo
     }
+  },
+  components: {
+    AppTableDrawer
   },
   data: () => ({
     page: 1,
@@ -132,6 +136,9 @@ export default {
     }
   },
   methods: {
+    setupColumns () {
+      this.$refs.tableCardDrawer.visible = true
+    },
     changeTableSize (size) {
       this.size = size
     },
@@ -189,8 +196,8 @@ export default {
     if (!this.noRouter) {
       const { query } = this.$route
       const { page, pageSize } = query
-      if (page && /^\d+$/.test(page)) this.page = this.parseInt(page)
-      if (pageSize && /^\d+$/.test(pageSize)) this.pageSize = this.parseInt(pageSize)
+      if (page && /^\d+$/.test(page)) this.page = this.$lodash.parseInt(page)
+      if (pageSize && /^\d+$/.test(pageSize)) this.pageSize = this.$lodash.parseInt(pageSize)
     }
   }
 }

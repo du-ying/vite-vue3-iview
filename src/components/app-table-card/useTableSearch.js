@@ -100,8 +100,7 @@ export function useTableSearchUtil () {
   }
 
   return {
-    parseToPlainInfo,
-    parseInt: _.parseInt
+    parseToPlainInfo
   }
 }
 

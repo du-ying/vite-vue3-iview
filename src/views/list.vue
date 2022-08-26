@@ -1,13 +1,13 @@
 <template>
   <div class="p-3">
     <AppTableCard ref="card"
-                    :page-size-opts="[50, 100]"
-                    :columns-data="columns"
-                    :search-data="search"
-                    :total="total"
-                    :loading="loading"
-                    @load-event="loadList"
-                    @export-data="exportAction">
+                  :page-size-opts="[50, 100]"
+                  :columns-data="columns"
+                  :search-data="search"
+                  :total="total"
+                  :loading="loading"
+                  @load-event="loadList"
+                  @export-data="exportAction">
       <template #search>
         <AppTableSearch label="关键词" prop="keyword" :invisible="search.type === '2'">
           <Input v-model.trim="search.keyword" />

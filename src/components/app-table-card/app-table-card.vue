@@ -68,7 +68,7 @@
       </div>
     </Col>
   </Row>
-  <slot name="default" :size="size"></slot>
+  <slot name="default" :size="size" :rebuild-columns="rebuildColumns"></slot>
   <Page class-name="mt-3 text-center" ref="tableCardPage" show-total show-elevator show-sizer
         @on-change="changePage"
         @on-page-size-change="changePageSize"
@@ -77,7 +77,8 @@
         :total="total"
         :page-size="pageSize"
         :page-size-opts="pageSizeOpts" />
-  <AppTableDrawer ref="tableCardDrawer" />
+  <AppTableDrawer ref="tableCardDrawer"
+                  :columns="columnsData" />
 </template>
 
 <script>
@@ -95,7 +96,8 @@ export default {
     total: { type: Number, default: 0 },
     loading: { type: Boolean, default: false },
     pageSizeOpts: { type: Array, default: () => [10, 20, 30, 40] },
-    columnsData: { type: Array }
+    columnsData: { type: Array, default: () => [] },
+    navigation: { type: String, default: 'replace' }
   },
   emits: ['export-data', 'load-event'],
   setup () {
@@ -123,7 +125,8 @@ export default {
     page: 1,
     pageSize: 10,
     visibleSearchBlock: true,
-    size: 'default'
+    size: 'default',
+    rebuildColumns: []
   }),
   computed: {
     toggleBtn () {
@@ -178,7 +181,7 @@ export default {
         const { path, query } = this.$route
         const pageSize = this.pageSize
         const newQuery = Object.assign({}, query, { page, pageSize })
-        this.$router.replace({ path, query: newQuery })
+        this.$router[this.navigation]({ path, query: newQuery })
       }
     },
     changePageSize (pageSize) {

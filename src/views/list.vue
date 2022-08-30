@@ -49,9 +49,18 @@
 export default {
   data: () => ({
     columns: [
+      { type: 'selection', width: 60, align: 'center', fixed: 'left' },
+      { type: 'index', width: 60, align: 'center', fixed: 'left' },
+      { type: 'expand', title: 'expand', fixed: 'left', renderHeader: (h, { column, index }) => h('span', 'expand-title') },
       { title: 'ID', key: 'id' },
       { title: '姓名', key: 'name' },
+      { title: 'column1', key: 'column1' },
+      { title: 'column2', key: 'column2' },
+      { title: 'column3', key: 'column3' },
+      { title: 'column4', key: 'column4' },
+      { title: 'column5', key: 'column5' },
       { title: '年龄', key: 'age' },
+      { title: '操作', key: 'action', fixed: 'right' }
     ],
     list: [
       { id: 1 },

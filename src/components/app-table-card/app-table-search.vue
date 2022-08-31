@@ -8,7 +8,7 @@
 
 <script setup>
 import { defineProps, onUnmounted, watch } from 'vue'
-import { useTableSearchItem } from '@components/app-table-card/useTableSearch.js'
+import { useTableSearchItem } from './useTableSearch.js'
 
 const props = defineProps({
   prop: String,

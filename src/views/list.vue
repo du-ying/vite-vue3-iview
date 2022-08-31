@@ -34,9 +34,9 @@
       <template #extra>
         <Button class="mb-3" type="primary" icon="md-add">新增</Button>
       </template>
-      <template #default="{ size }">
-        <Table border stripe
-               :columns="columns"
+      <template #default="{ size, rebuildColumns }">
+        <Table border stripe class="mt-3"
+               :columns="rebuildColumns"
                :data="list"
                :size="size"
                :loading="loading"></Table>

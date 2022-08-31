@@ -9,29 +9,37 @@
       </Checkbox>
     </template>
     <div class="app-table-drawer__body overflow-auto p-3">
-      <CheckboxGroup v-model="checkAllGroup" @on-change="checkAllGroupChange">
+      <CheckboxGroup :model-value="checkAllGroup" @on-change="checkAllGroupChange">
         <Divider size="small" v-show="left.length > 0">固定在左侧</Divider>
-        <div class="d-flex py-2 px-3 app-table-drawer__cell" v-for="(item, index) in left" :key="index">
-          <div class="w-100">
-            <Checkbox :label="item.__id">{{ item.title }}</Checkbox>
-          </div>
-          <div class="flex-shrink-1 text-nowrap">
-            <Tooltip placement="top" content="不固定">
-              <Button icon="md-pause" size="small" ghost class="border-0"
-                      @click="updatePosition(item, index, 'left', 'center')" />
-            </Tooltip>
-            <Tooltip placement="top" content="右固定">
-              <Button icon="md-skip-forward" size="small" ghost class="border-0"
-                      @click="updatePosition(item, index, 'left', 'right')" />
-            </Tooltip>
-          </div>
-        </div>
+        <Draggable group="center" item-key="__id" v-model="left">
+          <template #item="{ element, index }">
+            <div class="d-flex py-2 px-3 app-table-drawer__cell">
+              <div class="w-100">
+                <Checkbox :label="element.__id">
+                  <AppTableTitle :column="element" :index="element.__index" />
+                </Checkbox>
+              </div>
+              <div class="flex-shrink-1 text-nowrap">
+                <Tooltip placement="top" content="不固定">
+                  <Button icon="md-pause" size="small" ghost class="border-0"
+                          @click="updatePosition(element, index, 'left', 'center')" />
+                </Tooltip>
+                <Tooltip placement="top" content="右固定">
+                  <Button icon="md-skip-forward" size="small" ghost class="border-0"
+                          @click="updatePosition(element, index, 'left', 'right')" />
+                </Tooltip>
+              </div>
+            </div>
+          </template>
+        </Draggable>
         <Divider size="small" v-show="left.length > 0 || right.length > 0">不固定</Divider>
         <Draggable group="center" item-key="__id" v-model="center">
           <template #item="{ element, index }">
             <div class="d-flex py-2 px-3 app-table-drawer__cell">
               <div class="w-100">
-                <Checkbox :label="element.__id">{{ element.title }}</Checkbox>
+                <Checkbox :label="element.__id">
+                  <AppTableTitle :column="element" :index="element.__index" />
+                </Checkbox>
               </div>
               <div class="flex-shrink-1 text-nowrap">
                 <Tooltip placement="top" content="左固定">
@@ -46,42 +54,33 @@
             </div>
           </template>
         </Draggable>
-<!--        <div class="d-flex py-2 px-3 app-table-drawer__cell" v-for="(item, index) in center" :key="index">
-          <div class="w-100">
-            <Checkbox :label="JSON.stringify(item)">{{ item.title }}</Checkbox>
-          </div>
-          <div class="flex-shrink-1 text-nowrap">
-            <Tooltip placement="top" content="左固定">
-              <Button icon="md-skip-backward" size="small" ghost class="border-0"
-                      @click="updatePosition(item, index, 'center', 'left')" />
-            </Tooltip>
-            <Tooltip placement="top" content="右固定">
-              <Button icon="md-skip-forward" size="small" ghost class="border-0"
-                      @click="updatePosition(item, index, 'center', 'right')" />
-            </Tooltip>
-          </div>
-        </div>-->
         <Divider size="small" v-show="right.length > 0">固定在右侧</Divider>
-        <div class="d-flex py-2 px-3 app-table-drawer__cell" v-for="(item, index) in right" :key="index">
-          <div class="w-100">
-            <Checkbox :label="item.__id">{{ item.title }}</Checkbox>
-          </div>
-          <div class="flex-shrink-1 text-nowrap">
-            <Tooltip placement="top" content="左固定">
-              <Button icon="md-skip-backward" size="small" ghost class="border-0"
-                      @click="updatePosition(item, index, 'right', 'left')" />
-            </Tooltip>
-            <Tooltip placement="top" content="不固定">
-              <Button icon="md-pause" size="small" ghost class="border-0"
-                      @click="updatePosition(item, index, 'right', 'center')" />
-            </Tooltip>
-          </div>
-        </div>
+        <Draggable group="center" item-key="__id" v-model="right">
+          <template #item="{ element, index }">
+            <div class="d-flex py-2 px-3 app-table-drawer__cell">
+              <div class="w-100">
+                <Checkbox :label="element.__id">
+                  <AppTableTitle :column="element" :index="element.__index" />
+                </Checkbox>
+              </div>
+              <div class="flex-shrink-1 text-nowrap">
+                <Tooltip placement="top" content="左固定">
+                  <Button icon="md-skip-backward" size="small" ghost class="border-0"
+                          @click="updatePosition(element, index, 'right', 'left')" />
+                </Tooltip>
+                <Tooltip placement="top" content="不固定">
+                  <Button icon="md-pause" size="small" ghost class="border-0"
+                          @click="updatePosition(element, index, 'right', 'center')" />
+                </Tooltip>
+              </div>
+            </div>
+          </template>
+        </Draggable>
       </CheckboxGroup>
     </div>
     <div class="position-absolute border-top bottom-0 start-0 end-0 text-end app-table-drawer__footer">
-      <Button type="default" @click="parseColumnsToInit(columns)">重置</Button>
-      <Button type="primary" class="ms-3">确定</Button>
+      <Button type="default" @click="resetAction">重置</Button>
+      <Button type="primary" class="ms-3" @click="submitRebuild">确定</Button>
     </div>
   </Drawer>
 </template>
@@ -89,16 +88,27 @@
 <script>
 import Draggable from 'vuedraggable'
 import { useTableSearchUtil } from './useTableSearch.js'
+import AppTableTitle from './app-table-title.vue'
 
 export default {
-  components: { Draggable },
+  components: {
+    Draggable,
+    AppTableTitle
+  },
   props: {
     columns: { type: Array, default: () => [] }
   },
+  emits: ['rebuild-columns'],
   setup () {
-    const { getRandomStr } = useTableSearchUtil()
+    const {
+      getRandomStr,
+      getRebuildColumns,
+      transformInitColumns
+    } = useTableSearchUtil()
     return {
-      getRandomStr
+      getRandomStr,
+      getRebuildColumns,
+      transformInitColumns
     }
   },
   data: () => ({
@@ -109,18 +119,22 @@ export default {
     indeterminate: true,
     checkAll: false,
     visible: false,
+    rebuild: false
   }),
   methods: {
     parseColumnsToInit (columns) {
-      this.left.splice(0)
-      this.center.splice(0)
-      this.right.splice(0)
-      this.checkAllGroup.splice(0)
+      this.left = []
+      this.center = []
+      this.right = []
+      this.checkAllGroup = []
       this.indeterminate = false
       this.checkAll = true
-      columns.forEach(column => {
+      this.rebuild = false
+      columns.forEach((column, index) => {
         const id = this.getRandomStr(6)
         column.__id = id
+        column.__index = index
+        column.__fixed = column.fixed || 'center'
         if (column.fixed === 'left') {
           this.left.push(column)
         } else if (column.fixed === 'right') {
@@ -150,6 +164,7 @@ export default {
       }
     },
     checkAllGroupChange (data) {
+      this.checkAllGroup = data
       if (data.length === this.columns.length) {
         this.indeterminate = false
         this.checkAll = true
@@ -161,14 +176,41 @@ export default {
         this.checkAll = false
       }
     },
+    toggleVisible () {
+      this.visible = !this.visible
+    },
+    submitRebuild () {
+      this.toggleVisible()
+      this.rebuild = true
+      const columns = this.getRebuildColumns(this.checkAllGroup, this.left, this.center, this.right)
+      this.$emit('rebuild-columns', columns)
+    },
+    resetAction () {
+      this.toggleVisible()
+      this.rebuild = false
+      const [left, center, right, checkAll] = this.transformInitColumns(this.left, this.center, this.right)
+      this.left = left
+      this.center = center
+      this.right = right
+      this.checkAllGroup = checkAll
+      const columns = this.getRebuildColumns(this.checkAllGroup, this.left, this.center, this.right)
+      this.$emit('rebuild-columns', columns)
+    }
   },
   watch: {
     columns (currentColumns) {
       this.parseColumnsToInit(currentColumns)
     },
     visible (currentVisible) {
-      if (currentVisible) this.parseColumnsToInit(this.columns)
+      if (currentVisible && !this.rebuild) {
+        this.parseColumnsToInit(this.columns)
+      }
     }
+  },
+  created () {
+    this.parseColumnsToInit(this.columns)
+    const columns = this.getRebuildColumns(this.checkAllGroup, this.left, this.center, this.right)
+    this.$emit('rebuild-columns', columns)
   }
 }
 </script>

@@ -78,12 +78,13 @@
         :page-size="pageSize"
         :page-size-opts="pageSizeOpts" />
   <AppTableDrawer ref="tableCardDrawer"
+                  @rebuild-columns="rebuildColumnsHandler"
                   :columns="columnsData" />
 </template>
 
 <script>
-import { useTableSearchUtil, useTableSearchGroup } from '@components/app-table-card/useTableSearch.js'
-import AppTableDrawer from '@components/app-table-card/app-table-drawer.vue'
+import { useTableSearchUtil, useTableSearchGroup } from './useTableSearch.js'
+import AppTableDrawer from './app-table-drawer.vue'
 
 export default {
   inheritAttrs: false,
@@ -139,8 +140,11 @@ export default {
     }
   },
   methods: {
+    rebuildColumnsHandler (columns) {
+      this.rebuildColumns = columns
+    },
     setupColumns () {
-      this.$refs.tableCardDrawer.visible = true
+      this.$refs.tableCardDrawer.toggleVisible()
     },
     changeTableSize (size) {
       this.size = size

@@ -109,9 +109,50 @@ export function useTableSearchUtil () {
     return str
   }
 
+  function cloneColumns (columns) {
+    return _.clone(_.map(toRaw(columns), column => _.clone(toRaw(column))))
+  }
+
+  function transformColumns (columns, fixed) {
+    return _.map(cloneColumns(columns), column => {
+      column.fixed = fixed
+      return column
+    })
+  }
+
+  function getRebuildColumns (checkAllGroup, left, center, right) {
+    const allColumns = _.concat(
+      transformColumns(left, 'left'),
+      transformColumns(center, undefined),
+      transformColumns(right, 'right')
+    )
+    return _.map(
+      _.intersectionBy(
+        allColumns,
+        _.map(checkAllGroup, item => ({ __id: item })),
+        '__id'
+      ),
+      item => {
+        delete item.__id
+        delete item.__index
+        delete item.__fixed
+        return item
+      }
+    )
+  }
+
+  function transformInitColumns (left, center, right) {
+    const columns = _.orderBy(_.concat(left, center, right), ['__index'], ['asc'])
+    const checkAll = _.map(columns, '__id')
+    const { left: leftColumns, center: centerColumns, right: rightColumns } = _.groupBy(columns, '__fixed')
+    return [leftColumns, centerColumns, rightColumns, checkAll]
+  }
+
   return {
     parseToPlainInfo,
-    getRandomStr
+    getRandomStr,
+    getRebuildColumns,
+    transformInitColumns
   }
 }
 

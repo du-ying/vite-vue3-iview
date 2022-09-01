@@ -1,7 +1,6 @@
 <template>
   <Form class="mb-3" ref="tableCardForm" :label-width="100" label-colon
-        v-if="!noSearch"
-        v-show="visibleSearchBlock"
+        v-show="!noSearch && visibleSearchBlock"
         :model="searchData">
     <Row ref="tableCardFormItems" :gutter="8" justify="end">
       <slot name="search"></slot>
@@ -9,7 +8,7 @@
         <FormItem :label-width="0" class="text-end">
           <Button type="primary" icon="ios-search" :loading="loading" @click="searchAction">查询</Button>
           <Button class="ms-2" type="default" custom-icon="bi bi-arrow-repeat" :loading="loading" @click="resetAction">重置</Button>
-          <a class="ms-2" href="javascript:void(0)" v-if="!noExpand" @click="toggleExpand">
+          <a class="ms-2" href="javascript:void(0)" v-show="!noExpand" @click="toggleExpand">
             <span> {{ expandBtn.text }} </span>
             <Icon class="ms-1" :type="expandBtn.icon" />
           </a>
@@ -17,7 +16,7 @@
       </Col>
     </Row>
   </Form>
-  <Row>
+  <Row ref="tableCardToolbar">
     <Col class="flex-fill app-table-card__extra">
       <slot name="extra"></slot>
     </Col>
@@ -68,7 +67,7 @@
       </div>
     </Col>
   </Row>
-  <slot name="default" :size="size" :rebuild-columns="rebuildColumns"></slot>
+  <slot name="default" :size="size" :rebuild-columns="rebuildColumns" :max-height="maxHeight"></slot>
   <Page class-name="mt-3 text-center" ref="tableCardPage" show-total show-elevator show-sizer
         @on-change="changePage"
         @on-page-size-change="changePageSize"
@@ -85,6 +84,8 @@
 <script>
 import { useTableSearchUtil, useTableSearchGroup } from './useTableSearch.js'
 import AppTableDrawer from './app-table-drawer.vue'
+import { useElementSize, useWindowSize } from '@vueuse/core'
+import { ref } from 'vue'
 
 export default {
   inheritAttrs: false,
@@ -98,10 +99,11 @@ export default {
     loading: { type: Boolean, default: false },
     pageSizeOpts: { type: Array, default: () => [10, 20, 30, 40] },
     columnsData: { type: Array, default: () => [] },
-    navigation: { type: String, default: 'replace' }
+    navigation: { type: String, default: 'replace' },
+    resizeable: { type: Boolean, default: false }
   },
   emits: ['export-data', 'load-event'],
-  setup () {
+  setup (props) {
     const {
       toggleExpand,
       noSearch,
@@ -111,12 +113,28 @@ export default {
     const {
       parseToPlainInfo
     } = useTableSearchUtil()
+    const tableCardForm = ref(null)
+    const tableCardToolbar = ref(null)
+    const tableCardPage = ref(null)
+    const tableCardDrawer = ref(null)
+    const { height: formHeight } = props.resizeable ? useElementSize(tableCardForm) : { height: ref(0) }
+    const { height: toolbarHeight } = props.resizeable ? useElementSize(tableCardToolbar) : { height: ref(0) }
+    const { height: pageHeight } = props.resizeable ? useElementSize(tableCardPage) : { height: ref(0) }
+    const { height: windowHeight } = props.resizeable ? useWindowSize() : { height: ref(0) }
     return {
       toggleExpand,
       noSearch,
       noExpand,
       expandBtn,
-      parseToPlainInfo
+      parseToPlainInfo,
+      tableCardForm,
+      tableCardToolbar,
+      tableCardPage,
+      tableCardDrawer,
+      formHeight,
+      toolbarHeight,
+      pageHeight,
+      windowHeight
     }
   },
   components: {
@@ -136,7 +154,17 @@ export default {
           : { text: '展开查询', icon: 'bi bi-chevron-bar-expand' }
     },
     noColumnsSetup () {
-      return this.columnsData === undefined
+      return this.columnsData.length === 0
+    },
+    maxHeight () {
+      if (this.resizeable) {
+        const formHeight = this.formHeight === 0 ? 0 : this.formHeight + 16
+        const pageHeight = this.pageHeight === 0 ? 0 : this.pageHeight + 16
+        const max = this.windowHeight - formHeight - this.toolbarHeight - pageHeight
+        return max < 500 ? 500 : Math.floor(max)
+      } else {
+        return 500
+      }
     }
   },
   methods: {
@@ -144,7 +172,7 @@ export default {
       this.rebuildColumns = columns
     },
     setupColumns () {
-      this.$refs.tableCardDrawer.toggleVisible()
+      this.tableCardDrawer.toggleVisible()
     },
     changeTableSize (size) {
       this.size = size
@@ -170,7 +198,7 @@ export default {
       }
     },
     resetAction () {
-      this.$refs.tableCardForm.resetFields()
+      this.tableCardForm.resetFields()
       this.searchAction()
     },
     exportAction () {
@@ -190,7 +218,7 @@ export default {
     },
     changePageSize (pageSize) {
       this.pageSize = pageSize
-      if (this.page === this.$refs.tableCardPage.currentPage) {
+      if (this.page === this.tableCardPage.currentPage) {
         this.changePage(1)
       }
     }

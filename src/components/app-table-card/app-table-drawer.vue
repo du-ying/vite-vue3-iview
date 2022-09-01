@@ -1,5 +1,5 @@
 <template>
-  <Drawer v-model="visible" :width="320" :styles="{ padding: 0 }">
+  <Drawer v-model="visible" :width="320" :styles="{ padding: 0 }" @on-close="onClose">
     <template #header>
       <Checkbox class="me-2 app-table-drawer__header"
                 @click.prevent="handleCheckAll"
@@ -103,12 +103,12 @@ export default {
     const {
       getRandomStr,
       getRebuildColumns,
-      transformInitColumns
+      resortColumnsAndCheckAll
     } = useTableSearchUtil()
     return {
       getRandomStr,
       getRebuildColumns,
-      transformInitColumns
+      resortColumnsAndCheckAll
     }
   },
   data: () => ({
@@ -188,23 +188,29 @@ export default {
     resetAction () {
       this.toggleVisible()
       this.rebuild = false
-      const [left, center, right, checkAll] = this.transformInitColumns(this.left, this.center, this.right)
+      const [left, center, right, checkAll] = this.resortColumnsAndCheckAll(this.left, this.center, this.right)
       this.left = left
       this.center = center
       this.right = right
       this.checkAllGroup = checkAll
       const columns = this.getRebuildColumns(this.checkAllGroup, this.left, this.center, this.right)
       this.$emit('rebuild-columns', columns)
+    },
+    onClose () {
+      if (!this.rebuild) {
+        const [left, center, right, checkAll] = this.resortColumnsAndCheckAll(this.left, this.center, this.right)
+        this.left = left
+        this.center = center
+        this.right = right
+        this.checkAllGroup = checkAll
+        this.indeterminate = false
+        this.checkAll = true
+      }
     }
   },
   watch: {
     columns (currentColumns) {
       this.parseColumnsToInit(currentColumns)
-    },
-    visible (currentVisible) {
-      if (currentVisible && !this.rebuild) {
-        this.parseColumnsToInit(this.columns)
-      }
     }
   },
   created () {

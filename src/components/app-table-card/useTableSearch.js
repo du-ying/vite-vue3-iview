@@ -2,8 +2,8 @@ import { computed, reactive, ref, watch, onUnmounted, onMounted, inject, provide
 import _ from 'lodash'
 import qs from 'qs'
 
-const addSearchItemSymbol = Symbol()
-const updateSearchItemInvisibleSymbol = Symbol()
+const addSearchItemSymbol = Symbol('addSearchItem')
+const updateSearchItemInvisibleSymbol = Symbol('updateSearchItemInvisible')
 
 export function useTableSearchItem () {
   const expand = ref(true)
@@ -29,8 +29,8 @@ export function useTableSearchItem () {
 export function useTableSearchGroup () {
   const group = reactive([])
   const expand = ref(true)
-  const noSearch = ref(false)
-  const noExpand = ref(false)
+  const noSearch = ref(true)
+  const noExpand = ref(true)
 
   const expandBtn = computed(() => {
     return expand.value
@@ -141,10 +141,10 @@ export function useTableSearchUtil () {
     )
   }
 
-  function transformInitColumns (left, center, right) {
+  function resortColumnsAndCheckAll (left, center, right) {
     const columns = _.orderBy(_.concat(left, center, right), ['__index'], ['asc'])
     const checkAll = _.map(columns, '__id')
-    const { left: leftColumns, center: centerColumns, right: rightColumns } = _.groupBy(columns, '__fixed')
+    const { left: leftColumns = [], center: centerColumns = [], right: rightColumns = [] } = _.groupBy(columns, '__fixed')
     return [leftColumns, centerColumns, rightColumns, checkAll]
   }
 
@@ -152,8 +152,6 @@ export function useTableSearchUtil () {
     parseToPlainInfo,
     getRandomStr,
     getRebuildColumns,
-    transformInitColumns
+    resortColumnsAndCheckAll
   }
 }
-
-export function useTableResize () {}

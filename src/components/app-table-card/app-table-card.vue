@@ -102,7 +102,7 @@ export default {
     navigation: { type: String, default: 'replace' },
     resizeable: { type: Boolean, default: false }
   },
-  emits: ['export-data', 'load-event'],
+  emits: ['export-event', 'load-event'],
   setup (props) {
     const {
       toggleExpand,
@@ -203,7 +203,7 @@ export default {
     },
     exportAction () {
       const { page, pageSize } = this
-      this.$emit('export-data', page, pageSize)
+      this.$emit('export-event', page, pageSize)
     },
     changePage (page) {
       this.page = page

@@ -7,7 +7,7 @@
                   :total="total"
                   :loading="loading"
                   @load-event="loadList"
-                  @export-data="exportAction">
+                  @export-event="exportAction">
       <template #search>
         <AppTableSearch label="关键词" prop="keyword" :invisible="search.type === '2'">
           <Input v-model.trim="search.keyword" />
@@ -106,7 +106,7 @@ export default {
   }),
   methods: {
     exportAction (page, pageSize) {
-      console.log(`导出数据, page=${page}, pageSize=${pageSize}`)
+      console.log(`导出数据, page=${page}, pageSize=${pageSize}, search=${JSON.stringify(this.search)}`)
     },
     updateSearchModel ({ query }) {
       const { keyword, type, status, time } = query

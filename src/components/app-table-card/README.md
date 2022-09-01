@@ -1,16 +1,16 @@
 <!-- TOC -->
   * [AppTableCard](#apptablecard)
-    * [Props](#props)
-    * [Events](#events)
-    * [Slots](#slots)
-    * [Methods](#methods)
+    * [AppTableCard Props](#apptablecard-props)
+    * [AppTableCard Events](#apptablecard-events)
+    * [AppTableCard Slots](#apptablecard-slots)
+    * [AppTableCard Methods](#apptablecard-methods)
   * [AppTableSearch](#apptablesearch)
-    * [Props](#props)
-  * [代码示例](#)
+    * [AppTableSearch Props](#apptablesearch-props)
+  * [Demo](#demo)
 <!-- TOC -->
 
 ## AppTableCard
-### Props
+### AppTableCard Props
 | 属性             | 说明                                                                                                     | 类型      | 默认值                |
 |----------------|--------------------------------------------------------------------------------------------------------|---------|--------------------|
 | no-toolbar     | 当值为 `true` 时，不展示工具栏版块                                                                                  | Boolean | false              |
@@ -26,13 +26,13 @@
 | resizeable     | 当值为 `true` 时，开启 Window resize 事件，根据窗口高度改变 `default` 插槽 `maxHeight` 属性值                                 | Boolean | false              |
 
 
-### Events
+### AppTableCard Events
 | 事件名          | 说明                      | 返回值            |
 |--------------|-------------------------|----------------|
 | export-event | 点击工具栏中的下载按钮，用于导出服务端列表数据 | page, pageSize |
 | load-event   | 表格加载事件，用于请求服务端列表数据      | page, pageSize |
 
-### Slots
+### AppTableCard Slots
 | 名称      | 说明                                            | 作用域插槽属性                                                                                                           |
 |---------|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
 | search  | 搜索表单插槽，可放置多个子组件 `<AppTableSearch>` ，自动完成响应式布局 |                                                                                                                   |
@@ -40,14 +40,14 @@
 | default | 主体内容插槽                                        | size：表格尺寸，默认值为 default <br> rebuildColumns：重构表格列，初始选项由 `columns-data` 决定。默认值为 `[]` <br> maxHeight：表格最大高度，默认值为 500 |
 
 
-### Methods
+### AppTableCard Methods
 | 方法名           | 说明                                                                                           | 参数  |
 |---------------|----------------------------------------------------------------------------------------------|-----|
 | refreshAction | 刷新列表数据。当执行一个删除动作后，也可通过该方法来刷新列表数据。<br>注意，必须在 mounted 函数内执行一次该方法，来完成 - **_页面初始打开后，查询列表数据的效果_** |     |
 
 ## AppTableSearch
 
-### Props
+### AppTableSearch Props
 
 | 属性         | 说明                                                            | 类型      | 默认值   |
 |------------|---------------------------------------------------------------|---------|-------|
@@ -58,7 +58,7 @@
 | invisible  | 当值为 true 时，该搜索表单不可见                                           | Boolean | false |
 
 
-## 代码示例
+## Demo
 ```vue
 <template>
   <div class="p-3">

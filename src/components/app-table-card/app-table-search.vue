@@ -15,8 +15,6 @@ const props = defineProps({
   label: String,
   labelWidth: Number,
   labelFor: String,
-  required: Boolean,
-  rules: [Object, Array],
   invisible: { type: Boolean, default: false }
 })
 const {
